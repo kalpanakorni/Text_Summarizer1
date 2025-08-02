@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Summarizer - CodeTech IT Solutions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .intern-info {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            margin: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .intern-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .intern-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .method-selector {
+            margin-bottom: 30px;
+        }
+
+        .method-selector label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .method-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .method-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .method-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .method-btn.active {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            display: none;
+            background: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .slider {
+            width: 150px;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .summarize-btn {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+        }
+
+        .summarize-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+        }
+
+        .summarize-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .output-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .summary-output {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.8;
+            font-size: 1rem;
+            color: #333;
+            min-height: 100px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #3498db;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .method-buttons {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Text Summarizer</h1>
+            <p>Advanced Text Summarization using Multiple AI Approaches</p>
+        </div>
+
+
+
+        <div class="main-content">
+            <div class="method-selector">
+                <label>Select Summarization Method:</label>
+                <div class="method-buttons">
+                    <button class="method-btn active" data-method="weighting">TF-IDF Weighting</button>
+                    <button class="method-btn" data-method="query">Query-Based</button>
+                    <button class="method-btn" data-method="extraction">Information Extraction</button>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label for="textInput">Enter Text to Summarize:</label>
+                <textarea id="textInput" class="text-input" placeholder="Paste your text here... (minimum 100 words for better results)"></textarea>
+                <input type="text" id="queryInput" class="query-input" placeholder="Enter your query (e.g., 'student wizard magic potions')">
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label for="summaryLength">Summary Length (%):</label>
+                    <input type="range" id="summaryLength" class="slider" min="10" max="80" value="30">
+                    <span id="lengthValue">30%</span>
+                </div>
+                <div class="control-group">
+                    <label for="sentenceCount">Max Sentences:</label>
+                    <input type="range" id="sentenceCount" class="slider" min="3" max="15" value="8">
+                    <span id="sentenceValue">8</span>
+                </div>
+                <button id="summarizeBtn" class="summarize-btn">Generate Summary</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                Processing your text... Please wait.
+            </div>
+
+            <div class="output-section" id="outputSection" style="display: none;">
+                <h3>📄 Generated Summary</h3>
+                <div id="summaryOutput" class="summary-output"></div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="originalWords">0</div>
+                        <div class="stat-label">Original Words</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="summaryWords">0</div>
+                        <div class="stat-label">Summary Words</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="compressionRatio">0%</div>
+                        <div class="stat-label">Compression</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="sentencesUsed">0</div>
+                        <div class="stat-label">Sentences Used</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 CodeTech IT Solutions | Developed by Kalpana Korni | AI-Powered Text Summarization</p>
+        </div>
+    </div>
+
+    <script>
+        class TextSummarizer {
+            constructor() {
+                this.currentMethod = 'weighting';
+                this.stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'do', 'does', 'did', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their']);
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                // Method selection
+                document.querySelectorAll('.method-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentMethod = e.target.dataset.method;
+                        
+                        const queryInput = document.getElementById('queryInput');
+                        queryInput.style.display = this.currentMethod === 'query' ? 'block' : 'none';
+                    });
+                });
+
+                // Slider updates
+                document.getElementById('summaryLength').addEventListener('input', (e) => {
+                    document.getElementById('lengthValue').textContent = e.target.value + '%';
+                });
+
+                document.getElementById('sentenceCount').addEventListener('input', (e) => {
+                    document.getElementById('sentenceValue').textContent = e.target.value;
+                });
+
+                // Summarize button
+                document.getElementById('summarizeBtn').addEventListener('click', () => {
+                    this.generateSummary();
+                });
+            }
+
+            preprocessText(text) {
+                return text.toLowerCase()
+                    .replace(/[^\w\s\.!?]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+
+            tokenizeWords(text) {
+                return text.split(/\s+/).filter(word => word.length > 0);
+            }
+
+            tokenizeSentences(text) {
+                return text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0);
+            }
+
+            calculateTfIdf(sentences) {
+                const wordFreq = {};
+                const sentenceWords = [];
+                
+                // Calculate term frequency for each sentence
+                sentences.forEach((sentence, index) => {
+                    const words = this.tokenizeWords(this.preprocessText(sentence))
+                        .filter(word => !this.stopWords.has(word));
+                    
+                    sentenceWords[index] = words;
+                    
+                    words.forEach(word => {
+                        wordFreq[word] = (wordFreq[word] || 0) + 1;
+                    });
+                });
+
+                // Calculate document frequency
+                const docFreq = {};
+                sentences.forEach(sentence => {
+                    const uniqueWords = new Set(this.tokenizeWords(this.preprocessText(sentence))
+                        .filter(word => !this.stopWords.has(word)));
+                    
+                    uniqueWords.forEach(word => {
+                        docFreq[word] = (docFreq[word] || 0) + 1;
+                    });
+                });
+
+                // Calculate TF-IDF scores for sentences
+                const sentenceScores = sentences.map((sentence, index) => {
+                    const words = sentenceWords[index];
+                    let score = 0;
+                    
+                    words.forEach(word => {
+                        const tf = wordFreq[word] / words.length;
+                        const idf = Math.log(sentences.length / (docFreq[word] || 1));
+                        score += tf * idf;
+                    });
+                    
+                    return {
+                        sentence: sentence,
+                        score: score,
+                        index: index
+                    };
+                });
+
+                return sentenceScores;
+            }
+
+            weightingBasedSummary(text, maxSentences, compressionRatio) {
+                const sentences = this.tokenizeSentences(text);
+                const scoredSentences = this.calculateTfIdf(sentences);
+                
+                // Sort by score and select top sentences
+                const topSentences = scoredSentences
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, maxSentences);
+                
+                // Restore original order
+                const orderedSentences = topSentences
+                    .sort((a, b) => a.index - b.index)
+                    .map(item => item.sentence);
+                
+                return orderedSentences.join('. ') + '.';
+            }
+
+            queryBasedSummary(text, query, maxSentences) {
+                const sentences = this.tokenizeSentences(text);
+                const queryWords = this.tokenizeWords(this.preprocessText(query))
+                    .filter(word => !this.stopWords.has(word));
+                
+                const scoredSentences = this.calculateTfIdf(sentences);
+                
+                // Add query relevance score
+                scoredSentences.forEach(item => {
+                    const sentenceWords = this.tokenizeWords(this.preprocessText(item.sentence));
+                    let queryScore = 0;
+                    
+                    queryWords.forEach(queryWord => {
+                        const matches = sentenceWords.filter(word => word.includes(queryWord) || queryWord.includes(word));
+                        queryScore += matches.length * 2; // Boost query relevance
+                    });
+                    
+                    item.score = (item.score * 0.7) + (queryScore * 0.3);
+                });
+                
+                const topSentences = scoredSentences
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, maxSentences);
+                
+                const orderedSentences = topSentences
+                    .sort((a, b) => a.index - b.index)
+                    .map(item => item.sentence);
+                
+                return orderedSentences.join('. ') + '.';
+            }
+
+            informationExtractionSummary(text, maxSentences) {
+                const sentences = this.tokenizeSentences(text);
+                
+                // Simple subject-verb-object extraction simulation
+                const extractedInfo = sentences.map((sentence, index) => {
+                    const words = this.tokenizeWords(sentence);
+                    let score = 0;
+                    
+                    // Look for key patterns (simplified)
+                    const hasSubject = words.some(word => /^[A-Z]/.test(word));
+                    const hasVerb = words.some(word => ['is', 'are', 'was', 'were', 'has', 'have', 'will', 'can', 'does', 'did'].includes(word.toLowerCase()));
+                    const hasObject = words.length > 5;
+                    
+                    if (hasSubject) score += 2;
+                    if (hasVerb) score += 2;
+                    if (hasObject) score += 1;
+                    
+                    // Position bonus (earlier sentences often more important)
+                    score += Math.max(0, 3 - (index / sentences.length) * 3);
+                    
+                    return {
+                        sentence: sentence,
+                        score: score,
+                        index: index
+                    };
+                });
+                
+                const topSentences = extractedInfo
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, maxSentences);
+                
+                const orderedSentences = topSentences
+                    .sort((a, b) => a.index - b.index)
+                    .map(item => item.sentence);
+                
+                return orderedSentences.join('. ') + '.';
+            }
+
+            async generateSummary() {
+                const textInput = document.getElementById('textInput').value.trim();
+                const queryInput = document.getElementById('queryInput').value.trim();
+                const summaryLength = parseInt(document.getElementById('summaryLength').value);
+                const maxSentences = parseInt(document.getElementById('sentenceCount').value);
+                
+                if (!textInput) {
+                    alert('Please enter some text to summarize!');
+                    return;
+                }
+
+                if (this.currentMethod === 'query' && !queryInput) {
+                    alert('Please enter a query for query-based summarization!');
+                    return;
+                }
+
+                // Show loading
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('outputSection').style.display = 'none';
+                document.getElementById('summarizeBtn').disabled = true;
+
+                // Simulate processing time
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                try {
+                    let summary = '';
+                    
+                    switch (this.currentMethod) {
+                        case 'weighting':
+                            summary = this.weightingBasedSummary(textInput, maxSentences, summaryLength);
+                            break;
+                        case 'query':
+                            summary = this.queryBasedSummary(textInput, queryInput, maxSentences);
+                            break;
+                        case 'extraction':
+                            summary = this.informationExtractionSummary(textInput, maxSentences);
+                            break;
+                    }
+
+                    // Display results
+                    this.displayResults(textInput, summary);
+                    
+                } catch (error) {
+                    alert('Error generating summary: ' + error.message);
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('summarizeBtn').disabled = false;
+                }
+            }
+
+            displayResults(originalText, summary) {
+                const originalWords = this.tokenizeWords(originalText).length;
+                const summaryWords = this.tokenizeWords(summary).length;
+                const compressionRatio = Math.round((1 - summaryWords / originalWords) * 100);
+                const sentencesUsed = this.tokenizeSentences(summary).length;
+
+                document.getElementById('summaryOutput').textContent = summary;
+                document.getElementById('originalWords').textContent = originalWords;
+                document.getElementById('summaryWords').textContent = summaryWords;
+                document.getElementById('compressionRatio').textContent = compressionRatio + '%';
+                document.getElementById('sentencesUsed').textContent = sentencesUsed;
+                
+                document.getElementById('outputSection').style.display = 'block';
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new TextSummarizer();
+        });
+    </script>
+</body>
+</html>
