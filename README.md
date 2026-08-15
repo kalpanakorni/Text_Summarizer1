@@ -90,6 +90,10 @@ The application displays the following information after processing the input:
 * Summary Words
 * Compression Percentage
 * Sentences Used
+* <img width="1336" height="802" alt="Screenshot 2026-08-15 213649" src="https://github.com/user-attachments/assets/e34b2aa1-ccb9-4e30-9ef7-e11dd67569db" />
+<img width="992" height="901" alt="Screenshot 2026-08-15 213748" src="https://github.com/user-attachments/assets/97a1a496-b7a5-45d5-91b3-318346542c8d" />
+
+
 
 The statistics are calculated from the original text and the generated summary.
 
